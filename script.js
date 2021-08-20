@@ -1,75 +1,43 @@
-// 'Wednesday, August 18th'
+// formats moment for todays day 
 let currentDate = moment().format('dddd, MMMM Do')
 
-// populate p tag with currentDate
+// context of getting it from element 
 document.getElementById('currentDay').textContent = currentDate
 
 let presentHour = moment().hour()
 
-let workday = JSON.parse(localStorage.getItem('workday')) || schedule
-
-const stringInteger = (timeString) => {
-  switch (timeString) {
-    case '8AM': return 8
-    case '9AM': return 9
-    case '10AM': return 10
-    case '11AM': return 11
-    case '12PM': return 12
-    case '1PM': return 13
-    case '2PM': return 14
-    case '3PM': return 15
-    case '4PM': return 16
-    case '5PM': return 17
+// listener for on click function when clicked creates a task with inner html
+document.querySelector('#push').onclick = function () {
+  if (document.querySelector('#newtask input').value.length == 0) {
+    alert("Please Enter a Task")
+  }
+  // inner html has task input and delete box
+  else {
+    document.querySelector('#tasks').innerHTML += `
+            <div class="task">
+                <span id="taskname">
+                    ${document.querySelector('#newtask input').value}
+                </span>
+                <button class="delete">
+                    <i class="far fa-trash-alt"></i>
+                </button>
+            </div>
+        `;
+    // removes task from list when variable is clicked from parentNode
+    var current_tasks = document.querySelectorAll(".delete");
+    for (var i = 0; i < current_tasks.length; i++) {
+      current_tasks[i].onclick = function () {
+        this.parentNode.remove();
+      }
+    }
+    // when task deleted state reset and everything is cleared for next day
+    var tasks = document.querySelectorAll(".task");
+    for (var i = 0; i < tasks.length; i++) {
+      tasks[i].onclick = function () {
+        this.classList.toggle('completed');
+      }
+    }
+    // defines task based on input value of text 
+    document.querySelector("#newtask input").value = "";
   }
 }
-
-// handles highlights
-for (let i = 8; i <= 17; i++) {
-  let timeCounter = "time" + i
-  let timeString = document.getElementById(timeCounter).textContent //8AM
-  let timeInteger = stringInteger(timeString) // 8
-
-  if (presentHour == timeInteger) {
-    document.getElementById(timeCounter).nextElementSibling.children[0].classList.add('present')
-  }
-  else if (presentHour < timeInteger) {
-    document.getElementById(timeCounter).nextElementSibling.children[0].classList.add('future')
-  }
-  else if (presentHour > timeInteger) {
-    document.getElementById(timeCounter).nextElementSibling.children[0].classList.add('past')
-  }
-
-  // handle populating textareas
-  let planCounter = "plan" + i
-  document.getElementById(planCounter).textContent = workday[planCounter]
-
-}
-
-let schedule = {
-  'plan8': '',
-  'plan9': '',
-  'plan10': '',
-  'plan11': '',
-  'plan12': '',
-  'plan13': '',
-  'plan14': '',
-  'plan15': '',
-  'plan16': '',
-  'plan17': ''
-}
-
-
-// handle saving
-document.addEventListener('click', event => {
-  if (event.target.classList.contains('saveBtn')) {
-
-    let note = event.target.previousElementSibling.children[0].value
-
-    let plan = event.target.previousElementSibling.children[0].id
-
-    workday[plan] = note
-
-    localStorage.setItem('workday', JSON.stringify(workday))
-  }
-})
-
